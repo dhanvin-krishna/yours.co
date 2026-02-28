@@ -330,10 +330,10 @@ if (heroContainer) {
     hRenderer.setSize(heroContainer.clientWidth, heroContainer.clientHeight);
     hRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-    // Load Earth Texture Maps
+    // Load Earth Texture Maps locally to prevent CORS/Hotlink issues on Render
     const textureLoader = new THREE.TextureLoader();
-    const earthMap = textureLoader.load('https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/planets/earth_atmos_2048.jpg');
-    const earthSpec = textureLoader.load('https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/planets/earth_specular_2048.jpg');
+    const earthMap = textureLoader.load('/assets/images/textures/earth_atmos_2048.jpg');
+    const earthSpec = textureLoader.load('/assets/images/textures/earth_specular_2048.jpg');
 
     // The Core Sphere (Earth Textured)
     const sphereGeom = new THREE.SphereGeometry(1.5, 64, 64);
