@@ -25,32 +25,44 @@ createIcons({
 gsap.registerPlugin(ScrollTrigger);
 
 // ==========================================
+// MOBILE MENU
+// ==========================================
+const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+const mainNav = document.querySelector('.main-nav');
+
+if (mobileMenuBtn && mainNav) {
+    mobileMenuBtn.addEventListener('click', () => {
+        mainNav.classList.toggle('nav-open');
+    });
+}
+
+// ==========================================
 // DATA: SERVICES
 // ==========================================
 const servicesData = [
     {
+        id: 'launch',
+        title: '7-Day Brand Power Launch',
+        desc: 'Complete brand activation in one week: Website, Social, Ads, and Google presence.',
+        icon: 'megaphone'
+    },
+    {
         id: 'web',
-        title: 'Website Design & Dev',
-        desc: 'Immersive, high-performance digital platforms built for scale.',
+        title: 'Website + Funnel Systems',
+        desc: 'Conversion-focused platforms with mobile optimization, lead capture, and analytics.',
         icon: 'code'
     },
     {
-        id: 'seo',
-        title: 'SEO & Growth Opt',
-        desc: 'Data-driven strategies that dominate search engines and drive traffic.',
-        icon: 'target'
-    },
-    {
-        id: 'brand',
-        title: 'Branding & Identity',
-        desc: 'Distinctive visual identities that resonate and command authority.',
-        icon: 'fingerprint'
-    },
-    {
         id: 'marketing',
-        title: 'Performance Marketing',
-        desc: 'Unyielding campaigns optimized for maximum ROI and retention.',
+        title: 'Performance Marketing Retainers',
+        desc: 'Strategic Meta & Google ads with active involvement and robust remarketing.',
         icon: 'trending-up'
+    },
+    {
+        id: 'retail',
+        title: 'Retail Digital Integration',
+        desc: 'QR systems, loyalty funnels, and review automation for physical businesses.',
+        icon: 'fingerprint'
     }
 ];
 
@@ -184,10 +196,10 @@ if (canvas) {
     const renderer = new THREE.WebGLRenderer({
         canvas: canvas,
         alpha: true,
-        antialias: false // Disable antialiasing for performance
+        antialias: false // Disabled for background performance
     });
     renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(1); // Force pixel ratio to 1 to prevent retina stuttering
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5)); // Optimized limit
 
     // Geometry: Abstract Icosahedron
     const geometry = new THREE.IcosahedronGeometry(2.5, 1);
@@ -239,10 +251,10 @@ if (canvas) {
 
     // Animation Loop
     const clock = new THREE.Clock();
-    let isBgVisible = true; // Optimization flag
+    let isBgVisible = true;
 
     const tick = () => {
-        if (isBgVisible) {
+        if (isBgVisible && !document.hidden) {
             const elapsedTime = clock.getElapsedTime();
 
             // Rotate main object
@@ -302,7 +314,7 @@ if (heroContainer) {
 
     // High quality rendering optimizations
     hRenderer.setSize(heroContainer.clientWidth, heroContainer.clientHeight);
-    hRenderer.setPixelRatio(1); // Force to 1 to stop Mac stuttering
+    hRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5)); // Optimized limit
 
     // The Geometric Polygon (Icosahedron)
     // We create two meshes: a solid dark inner core and a glowing wireframe outer shell
@@ -321,22 +333,9 @@ if (heroContainer) {
             uColor3: { value: new THREE.Color(0x2a2a2a) }  // Lighter grey highlight
         },
         vertexShader: `
-            varying vec2 vUv;
-            varying vec3 vPosition;
-            void main() {
-                vUv = uv;
-                vPosition = position;
-                gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-            }
-        `,
-        fragmentShader: `
             uniform float uTime;
-            uniform vec3 uColor1;
-            uniform vec3 uColor2;
-            uniform vec3 uColor3;
-
             varying vec2 vUv;
-            varying vec3 vPosition;
+            varying float vNoise;
 
             // Simple 3D Noise function
             vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
@@ -406,18 +405,26 @@ if (heroContainer) {
             }
 
             void main() {
-                // Generate a noise value based on position and time
-                float noiseVal = snoise(vPosition * 1.5 + uTime * 0.2);
+                vUv = uv;
                 
-                // Add a second layer of finer noise
-                noiseVal += 0.5 * snoise(vPosition * 3.0 - uTime * 0.3);
-                
-                // Normalize noise
-                noiseVal = noiseVal * 0.5 + 0.5;
+                float noiseVal = snoise(position * 1.5 + uTime * 0.2);
+                noiseVal += 0.5 * snoise(position * 3.0 - uTime * 0.3);
+                vNoise = noiseVal * 0.5 + 0.5;
 
-                // Mix colors based on noise ranges
-                vec3 finalColor = mix(uColor1, uColor2, smoothstep(0.0, 0.5, noiseVal));
-                finalColor = mix(finalColor, uColor3, smoothstep(0.5, 1.0, noiseVal));
+                gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+            }
+        `,
+        fragmentShader: `
+            uniform vec3 uColor1;
+            uniform vec3 uColor2;
+            uniform vec3 uColor3;
+
+            varying vec2 vUv;
+            varying float vNoise;
+
+            void main() {
+                vec3 finalColor = mix(uColor1, uColor2, smoothstep(0.0, 0.5, vNoise));
+                finalColor = mix(finalColor, uColor3, smoothstep(0.5, 1.0, vNoise));
 
                 gl_FragColor = vec4(finalColor, 1.0);
             }
@@ -546,7 +553,7 @@ if (heroContainer) {
     observer.observe(document.querySelector('.hero-section'));
 
     const hTick = () => {
-        if (isHeroVisible) {
+        if (isHeroVisible && !document.hidden) {
             const elapsedTime = hClock.getElapsedTime();
 
             // Constant idle rotation
@@ -692,8 +699,10 @@ const themes = {
 const sectionThemes = [
     { selector: '#hero', theme: 'dark' },
     { selector: '#services', theme: 'light' },
+    { selector: '#usp-launch', theme: 'dark' },
+    { selector: '#funnel', theme: 'dark' },
     { selector: '#about', theme: 'dark' },
-    { selector: '#contact', theme: 'light' }
+    { selector: '#contact', theme: 'dark' }
 ];
 
 sectionThemes.forEach(({ selector, theme }) => {
@@ -702,7 +711,7 @@ sectionThemes.forEach(({ selector, theme }) => {
 
     ScrollTrigger.create({
         trigger: el,
-        start: 'top 50%',
+        start: 'top 50%', // Change theme when section reaches middle of screen
         end: 'bottom 50%',
         onEnter: () => applyTheme(theme),
         onEnterBack: () => applyTheme(theme)
@@ -765,6 +774,54 @@ gsap.fromTo('.usp-item',
     }
 );
 
+// ==========================================
+// FUNNEL SECTION ANIMATIONS
+// ==========================================
+const funnelSteps = document.querySelectorAll('.funnel-step');
+const progressLine = document.querySelector('.funnel-progress-line');
+
+if (funnelSteps.length > 0 && progressLine) {
+    // Animate the progress line height based on scroll
+    gsap.to(progressLine, {
+        height: '100%',
+        ease: 'none',
+        scrollTrigger: {
+            trigger: '.funnel-grid',
+            start: 'top center',
+            end: 'bottom center',
+            scrub: true
+        }
+    });
+
+    // Animate each step entering and activating
+    funnelSteps.forEach((step, index) => {
+        const stepNumber = step.querySelector('.step-number');
+        const stepContent = step.querySelector('.step-content');
+
+        // Reveal animation
+        gsap.to(step, {
+            scrollTrigger: {
+                trigger: step,
+                start: 'top 80%',
+                onEnter: () => step.classList.add('visible'),
+                onEnterBack: () => step.classList.add('visible'),
+                // toggleActions: 'play none none reverse'
+            }
+        });
+
+        // Activation animation (when centered)
+        ScrollTrigger.create({
+            trigger: step,
+            start: 'top center',
+            end: 'bottom center',
+            onEnter: () => step.classList.add('active'),
+            onLeave: () => step.classList.remove('active'),
+            onEnterBack: () => step.classList.add('active'),
+            onLeaveBack: () => step.classList.remove('active')
+        });
+    });
+}
+
 // Number Counters (About Us)
 const statsCards = document.querySelectorAll('.stat-number');
 
@@ -821,7 +878,7 @@ if (form) {
             form.reset();
 
             setTimeout(() => {
-                text.innerHTML = 'Send Message';
+                text.innerHTML = 'Submit Request';
                 btn.style.backgroundColor = 'transparent';
                 btn.style.color = 'var(--c-white)';
                 btn.style.pointerEvents = 'auto';
