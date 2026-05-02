@@ -873,7 +873,7 @@ if (form) {
         if (result) result.style.display = 'none';
 
         const formData = new FormData(form);
-        const scriptURL = 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE'; // Replace this with your Google Apps Script Web App URL
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbxB5IPyIGWUY_3up8-Cllm1VSJwvhrbHpsjNuSfCipQT0DND8M2glB_QkqhSd6CltFNbA/exec'; // Replace this with your Google Apps Script Web App URL
 
         try {
             const response = await fetch(scriptURL, {
