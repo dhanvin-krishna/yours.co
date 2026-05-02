@@ -251,20 +251,21 @@
         </div>
         <div class="contact-form-container">
           <form id="contact-form" class="premium-form">
+            <input type="hidden" name="access_key" value="50163ca1-663a-43e7-b975-92a605a211a2">
             <div class="input-group">
-              <input type="text" id="name" required>
+              <input type="text" id="name" name="name" required>
               <label for="name">Full Name</label>
             </div>
             <div class="input-group">
-              <input type="email" id="email" required>
+              <input type="email" id="email" name="email" required>
               <label for="email">Email Address</label>
             </div>
             <div class="input-group">
-              <input type="text" id="company">
+              <input type="text" id="company" name="company">
               <label for="company">Company Name</label>
             </div>
             <div class="input-group">
-              <select id="service" required>
+              <select id="service" name="service" required>
                 <option value="" disabled selected></option>
                 <option value="web">Website Design & Dev</option>
                 <option value="seo">SEO & Growth</option>
@@ -274,13 +275,14 @@
               <label for="service" class="select-label">Service Required</label>
             </div>
             <div class="input-group full-width">
-              <textarea id="message" rows="4" required></textarea>
+              <textarea id="message" name="message" rows="4" required></textarea>
               <label for="message">Your Message</label>
             </div>
             <button type="submit" class="btn btn-primary submit-btn magnetic">
               <span class="btn-text">Submit Request</span>
               <span class="btn-loader"></span>
             </button>
+            <p class="form-result" style="display: none; margin-top: 1rem; color: var(--color-primary);"></p>
           </form>
         </div>
       </div>

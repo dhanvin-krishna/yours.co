@@ -862,27 +862,66 @@ inputs.forEach(input => {
 // Wrap submit action
 const form = document.getElementById('contact-form');
 if (form) {
-    form.addEventListener('submit', (e) => {
+    form.addEventListener('submit', async (e) => {
         e.preventDefault();
         const btn = form.querySelector('.submit-btn');
         const text = btn.querySelector('.btn-text');
+        const result = form.querySelector('.form-result');
 
         btn.style.pointerEvents = 'none';
         text.innerHTML = 'Sending...';
+        if (result) result.style.display = 'none';
 
-        // Simulate API Call
-        setTimeout(() => {
-            text.innerHTML = 'Message Sent';
-            btn.style.backgroundColor = 'var(--c-white)';
-            btn.style.color = 'var(--c-black)';
-            form.reset();
+        const formData = new FormData(form);
+        const object = Object.fromEntries(formData);
+        const json = JSON.stringify(object);
 
+        try {
+            const response = await fetch('https://api.web3forms.com/submit', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: json
+            });
+            const res = await response.json();
+
+            if (res.success) {
+                text.innerHTML = 'Message Sent';
+                btn.style.backgroundColor = 'var(--c-white)';
+                btn.style.color = 'var(--c-black)';
+                if (result) {
+                    result.innerHTML = res.message;
+                    result.style.display = 'block';
+                    result.style.color = '#4ade80';
+                }
+                form.reset();
+            } else {
+                console.log(res);
+                text.innerHTML = 'Error Sending';
+                if (result) {
+                    result.innerHTML = res.message;
+                    result.style.display = 'block';
+                    result.style.color = '#ef4444';
+                }
+            }
+        } catch (error) {
+            console.log(error);
+            text.innerHTML = 'Error Sending';
+            if (result) {
+                result.innerHTML = 'Something went wrong!';
+                result.style.display = 'block';
+                result.style.color = '#ef4444';
+            }
+        } finally {
             setTimeout(() => {
                 text.innerHTML = 'Submit Request';
                 btn.style.backgroundColor = 'transparent';
                 btn.style.color = 'var(--c-white)';
                 btn.style.pointerEvents = 'auto';
-            }, 3000);
-        }, 1500);
+                if (result) result.style.display = 'none';
+            }, 4000);
+        }
     });
 }
