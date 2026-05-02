@@ -873,26 +873,21 @@ if (form) {
         if (result) result.style.display = 'none';
 
         const formData = new FormData(form);
-        const object = Object.fromEntries(formData);
-        const json = JSON.stringify(object);
+        const scriptURL = 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE'; // Replace this with your Google Apps Script Web App URL
 
         try {
-            const response = await fetch('https://api.web3forms.com/submit', {
+            const response = await fetch(scriptURL, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                body: json
+                body: formData
             });
             const res = await response.json();
 
-            if (res.success) {
+            if (res.result === 'success') {
                 text.innerHTML = 'Message Sent';
                 btn.style.backgroundColor = 'var(--c-white)';
                 btn.style.color = 'var(--c-black)';
                 if (result) {
-                    result.innerHTML = res.message;
+                    result.innerHTML = 'Thanks for reaching out! We will get back to you soon.';
                     result.style.display = 'block';
                     result.style.color = '#4ade80';
                 }
@@ -901,7 +896,7 @@ if (form) {
                 console.log(res);
                 text.innerHTML = 'Error Sending';
                 if (result) {
-                    result.innerHTML = res.message;
+                    result.innerHTML = 'There was an error saving your submission.';
                     result.style.display = 'block';
                     result.style.color = '#ef4444';
                 }
